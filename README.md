@@ -1,6 +1,12 @@
-# SRT → Excel Converter
+# Guion Converter
 
 Aplicación de escritorio para Windows (Electron) que convierte archivos `.srt` a Excel con formato estructurado de guion.
+
+## Descarga
+
+[![Download](https://img.shields.io/badge/Download-v1.0.0-blue?style=for-the-badge&logo=windows)](https://github.com/DEdgamer1123/Guion-Converter/releases/latest/download/Guion.Converter.Setup.1.0.0.exe)
+
+O ve a [Releases](https://github.com/DEdgamer1123/Guion-Converter/releases) para todas las versiones.
 
 ## ¿Qué hace?
 
@@ -55,12 +61,17 @@ El capítulo se detecta automáticamente del nombre del archivo. Formatos soport
 ## Estructura del proyecto
 
 ```
-srt-excel-converter/
+guion-converter/
 ├── main.js          # Proceso principal Electron (Node.js)
 ├── preload.js       # Puente seguro entre procesos
 ├── package.json     # Configuración y dependencias
+├── logo.ico         # Ícono de la aplicación
 ├── src/
 │   ├── index.html   # Interfaz principal
 │   └── renderer.js  # Lógica del frontend
-└── assets/          # Iconos de la app
+└── dist/            # Instalador generado (no incluido en el repo)
 ```
+
+## Licencia
+
+MIT © DEdgamer1123
