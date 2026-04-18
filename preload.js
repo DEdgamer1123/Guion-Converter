@@ -9,4 +9,8 @@ contextBridge.exposeInMainWorld('api', {
   windowClose: () => ipcRenderer.send('window-close'),
   onMaximize:   (cb) => ipcRenderer.on('window-maximized',   cb),
   onUnmaximize: (cb) => ipcRenderer.on('window-unmaximized', cb),
+  onUpdateAvailable: (cb) => ipcRenderer.on('update-available', (_, data) => cb(data)),
+  onUpdateProgress: (cb) => ipcRenderer.on('update-progress', (_, data) => cb(data)),
+  onUpdateDownloaded: (cb) => ipcRenderer.on('update-downloaded', (_, data) => cb(data)),
+  downloadUpdateNow: () => ipcRenderer.send('update-download-now'),
 });

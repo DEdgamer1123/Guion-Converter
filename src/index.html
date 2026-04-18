@@ -830,6 +830,95 @@
       from { opacity: 0; transform: translateX(-16px) scale(0.96); }
       to { opacity: 1; transform: translateX(0) scale(1); }
     }
+
+    /* ═══ UPDATE DIALOG ═══ */
+    #update-dialog {
+      position: fixed; inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity 0.4s var(--ease);
+    }
+    #update-dialog.show {
+      display: flex;
+      opacity: 1;
+    }
+    .update-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px 40px;
+      max-width: 380px;
+      text-align: center;
+      box-shadow:
+        0 24px 80px rgba(0,0,0,0.6),
+        0 0 0 1px rgba(255,255,255,0.05);
+      transform: scale(0.92) translateY(20px);
+      transition: transform 0.4s var(--ease-spring);
+    }
+    #update-dialog.show .update-card {
+      transform: scale(1) translateY(0);
+    }
+    .update-icon {
+      width: 64px; height: 64px;
+      margin: 0 auto 20px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--peach-soft), var(--lavender-soft));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+    }
+    .update-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; font-weight: 500;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .update-msg {
+      font-size: 13px; color: var(--text-2);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+    .update-progress-bar {
+      height: 4px;
+      background: linear-gradient(90deg, var(--peach), var(--lavender), var(--mint));
+      border-radius: 2px;
+      margin-bottom: 24px;
+      transition: width 0.3s var(--ease);
+    }
+    .update-buttons {
+      display: flex; gap: 12px;
+      justify-content: center;
+    }
+    .btn-update {
+      padding: 12px 24px;
+      border-radius: var(--radius);
+      font-size: 12px; font-weight: 600;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s var(--ease);
+    }
+    .btn-update-now {
+      background: linear-gradient(135deg, var(--peach), var(--lavender));
+      color: #0e0e12;
+      border: none;
+    }
+    .btn-update-now:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(244,168,150,0.25);
+    }
+    .btn-update-later {
+      background: transparent;
+      color: var(--text-2);
+      border: 1px solid var(--border);
+    }
+    .btn-update-later:hover {
+      border-color: var(--border-accent);
+      color: var(--text);
+    }
   </style>
 </head>
 <body>
@@ -946,6 +1035,19 @@
 </div>
 
 <div id="toast-container"></div>
+
+<div id="update-dialog">
+  <div class="update-card">
+    <div class="update-icon">⬆</div>
+    <div class="update-title">Nueva versión disponible</div>
+    <div class="update-msg">Versión 1.0.1 disponible</div>
+    <div class="update-progress-bar" style="width: 0%"></div>
+    <div class="update-buttons">
+      <button class="btn-update btn-update-now" id="btn-update-now">Descargar ahora</button>
+      <button class="btn-update btn-update-later" id="btn-update-later">Más tarde</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // Metaball Lava Lamp

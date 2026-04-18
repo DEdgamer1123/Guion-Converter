@@ -2,8 +2,59 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const ExcelJS = require('exceljs');
+const { autoUpdater } = require('electron-updater');
 
 let mainWindow;
+
+function setupAutoUpdater() {
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  autoUpdater.on('checking-for-update', () => {
+    console.log('[AutoUpdater] Checking for updates...');
+  });
+
+  autoUpdater.on('update-available', (info) => {
+    console.log('[AutoUpdater] Update available:', info.version);
+    if (mainWindow) {
+      mainWindow.webContents.send('update-available', {
+        version: info.version,
+        releaseNotes: info.releaseNotes
+      });
+    }
+  });
+
+  autoUpdater.on('update-not-available', () => {
+    console.log('[AutoUpdater] No updates available');
+  });
+
+  autoUpdater.on('download-progress', (progress) => {
+    if (mainWindow) {
+      mainWindow.webContents.send('update-progress', {
+        percent: progress.percent,
+        transferred: progress.transferred,
+        total: progress.total
+      });
+    }
+  });
+
+  autoUpdater.on('update-downloaded', (info) => {
+    console.log('[AutoUpdater] Update downloaded:', info.version);
+    if (mainWindow) {
+      mainWindow.webContents.send('update-downloaded', {
+        version: info.version
+      });
+    }
+  });
+
+  autoUpdater.on('error', (err) => {
+    console.error('[AutoUpdater] Error:', err.message);
+  });
+
+  autoUpdater.checkForUpdates().catch(err => {
+    console.error('[AutoUpdater] Check failed:', err.message);
+  });
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -28,7 +79,10 @@ function createWindow() {
   mainWindow.on('unmaximize', () => mainWindow.webContents.send('window-unmaximized'));
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+  setupAutoUpdater();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
@@ -45,6 +99,11 @@ ipcMain.on('window-maximize', () => {
   else mainWindow.maximize();
 });
 ipcMain.on('window-close', () => mainWindow.close());
+
+// Auto-updater controls
+ipcMain.on('update-download-now', () => {
+  autoUpdater.quitAndInstall(false, true);
+});
 
 // Parse SRT content
 function parseSRT(content) {
@@ -190,7 +249,7 @@ ipcMain.handle('save-excel', async (_, parsedFiles) => {
 
     // ---- Sheet GUION ----
     const guionSheet = wb.addWorksheet('GUION');
-    const guionHeaders = ['Capitulo', 'Inicio', 'Fin', 'Personaje', 'Dialogo'];
+    const guionHeaders = ['Capitulo', 'Inicio', 'Fin', 'Personaje', 'Dialogo', 'Palabras'];
     const guionHeaderRow = guionSheet.addRow(guionHeaders);
     styleHeaderRow(guionHeaderRow, 'GUION');
     guionSheet.columns = [
@@ -198,7 +257,8 @@ ipcMain.handle('save-excel', async (_, parsedFiles) => {
       { key: 'Inicio', width: 16 },
       { key: 'Fin', width: 16 },
       { key: 'Personaje', width: 20 },
-      { key: 'Dialogo', width: 60 }
+      { key: 'Dialogo', width: 60 },
+      { key: 'Palabras', width: 12 }
     ];
 
     for (const f of parsedFiles) {
@@ -213,6 +273,11 @@ ipcMain.handle('save-excel', async (_, parsedFiles) => {
         styleDataRow(row);
         // Wrap dialog text
         row.getCell(5).alignment = { wrapText: true, vertical: 'top' };
+        // Column F (Palabras) - formula to count words
+        row.getCell(6).value = {
+          type: 'formula',
+          formula: `IF(LEN(TRIM(E${row.number}))=0,0,LEN(TRIM(E${row.number}))-LEN(SUBSTITUTE(E${row.number}," ",""))+1)`
+        };
       }
     }
 

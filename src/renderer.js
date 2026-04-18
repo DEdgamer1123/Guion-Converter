@@ -1,6 +1,7 @@
 // State
 let parsedFiles = [];
 let activeTab = 'guion';
+let updateState = { available: false, version: null, downloaded: false, progress: 0 };
 
 // ── DRAG & DROP ──────────────────────────────────────────
 function handleDragOver(e) {
@@ -280,3 +281,76 @@ function showToast(msg, type = 'success') {
 function escHtml(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// ── AUTO-UPDATE LISTENERS ────────────────────────────────────────
+function setupUpdateListeners() {
+  if (!window.api) return;
+
+  window.api.onUpdateAvailable((data) => {
+    updateState.available = true;
+    updateState.version = data.version;
+    showUpdateDialog(data.version, false);
+  });
+
+  window.api.onUpdateProgress((data) => {
+    updateState.progress = data.percent;
+    updateState.downloaded = false;
+    updateDownloadProgress(data.percent);
+  });
+
+  window.api.onUpdateDownloaded((data) => {
+    updateState.downloaded = true;
+    showUpdateDialog(data.version, true);
+  });
+}
+
+function showUpdateDialog(version, ready) {
+  const dialog = document.getElementById('update-dialog');
+  if (!dialog) return;
+
+  const title = dialog.querySelector('.update-title');
+  const msg = dialog.querySelector('.update-msg');
+  const nowBtn = document.getElementById('btn-update-now');
+  const laterBtn = document.getElementById('btn-update-later');
+
+  if (ready) {
+    title.textContent = 'Actualización lista';
+    msg.textContent = `Versión ${version} descargada. ¿Reiniciar ahora?`;
+    nowBtn.textContent = 'Reiniciar ahora';
+  } else {
+    title.textContent = 'Nueva versión disponible';
+    msg.textContent = `Versión ${version} disponible. ¿Descargar ahora?`;
+    nowBtn.textContent = 'Descargar ahora';
+  }
+
+  dialog.classList.add('show');
+
+  nowBtn.onclick = () => {
+    if (ready) {
+      window.api.downloadUpdateNow();
+    } else {
+      showToast('Descargando actualización...', 'success');
+    }
+  };
+  laterBtn.onclick = () => {
+    dialog.classList.remove('show');
+  };
+}
+
+function updateDownloadProgress(percent) {
+  const dialog = document.getElementById('update-dialog');
+  if (!dialog) return;
+
+  const progress = dialog.querySelector('.update-progress-bar');
+  if (progress) {
+    progress.style.width = percent + '%';
+  }
+}
+
+function hideUpdateDialog() {
+  const dialog = document.getElementById('update-dialog');
+  if (dialog) dialog.classList.remove('show');
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', setupUpdateListeners);
