@@ -4,7 +4,7 @@ Aplicación de escritorio para Windows (Electron) que convierte archivos `.srt` 
 
 ## Descarga
 
-[![Download](https://img.shields.io/badge/Download-v1.0.0-blue?style=for-the-badge&logo=windows)](https://github.com/DEdgamer1123/Guion-Converter/releases/latest/download/Guion.Converter.Setup.1.0.0.exe)
+[![Download](https://img.shields.io/badge/Download-v1.1.0-blue?style=for-the-badge&logo=windows)](https://github.com/DEdgamer1123/Guion-Converter/releases/latest/download/Guion-Converter-Setup-1.1.0.exe)
 
 O ve a [Releases](https://github.com/DEdgamer1123/Guion-Converter/releases) para todas las versiones.
 
@@ -15,7 +15,7 @@ O ve a [Releases](https://github.com/DEdgamer1123/Guion-Converter/releases) para
 - Vista previa en tiempo real de los datos
 - Exporta un `.xlsx` con dos hojas:
   - **CV**: columnas `Capitulo`, `Nombre`, `Foto` — una fila por capítulo
-  - **GUION**: columnas `Capitulo`, `Inicio`, `Fin`, `Personaje`, `Dialogo` — una fila por línea de subtítulo
+  - **GUION**: columnas `Capitulo`, `Inicio`, `Fin`, `Personaje`, `Dialogo`, `Palabras` — una fila por línea de subtítulo
 
 ## Instalación y uso
 
@@ -45,6 +45,14 @@ npm install --save-dev electron-builder
 # Generar instalador en /dist
 npm run build
 ```
+
+## Actualizaciones automáticas
+
+La app verifica automáticamente si hay una nueva versión cada vez que la inicias.
+Si hay actualización disponible, verás una notificación con opciones:
+
+- **Descargar ahora**: Descarga e instala la nueva versión
+- **Más tarde**: Descarta la notificación (te avisará de nuevo la próxima vez)
 
 ## Nombres de archivos SRT
 
